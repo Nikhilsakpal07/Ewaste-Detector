@@ -392,5 +392,47 @@ def analyze_image():
         "image": f"data:image/jpeg;base64,{base64_img}"
     })
 
+@app.route('/api/analyze_frame_yolo', methods=['POST'])
+def analyze_frame_yolo():
+    if 'image' not in request.files:
+        return jsonify({"error": "No image uploaded"}), 400
+        
+    file = request.files['image']
+    npimg = np.frombuffer(file.read(), np.uint8)
+    frame = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
+    
+    processed_frame, info = process_frame_for_info(frame)
+    
+    if info:
+        c_name = info['class']
+        impact_text = "Checking Gemini AI..."
+        if c_name in gemini_cache:
+            impact_text = gemini_cache[c_name]
+        elif c_name not in fetching_classes:
+            fetching_classes.add(c_name)
+            def bg_fetch(name):
+                txt = fetch_gemini_info(name)
+                gemini_cache[name] = txt
+                fetching_classes.discard(name)
+            threading.Thread(target=bg_fetch, args=(c_name,), daemon=True).start()
+            
+        info['impact'] = impact_text
+    else:
+        info = {
+            'class': 'None',
+            'confidence': 0,
+            'value': '₹0',
+            'hazard': False,
+            'impact': 'Scanning...'
+        }
+        
+    _, buffer = cv2.imencode('.jpg', processed_frame)
+    base64_img = base64.b64encode(buffer).decode('utf-8')
+    
+    return jsonify({
+        "info": info,
+        "image": f"data:image/jpeg;base64,{base64_img}"
+    })
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000, threaded=True)

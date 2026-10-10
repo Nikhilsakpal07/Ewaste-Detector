@@ -184,6 +184,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    const liveVideo = document.createElement("video");
+    liveVideo.autoplay = true;
+    liveVideo.playsInline = true;
+    const liveCanvas = document.createElement("canvas");
+    let liveStream = null;
+    let liveFeedInterval = null;
+
     btnLive.addEventListener("click", () => {
         if (isLiveMode) return;
         isLiveMode = true;
@@ -193,9 +200,38 @@ document.addEventListener("DOMContentLoaded", () => {
         uploadView.classList.remove("active");
         liveView.classList.add("active");
         
-        videoFeed.src = "/video_feed?" + new Date().getTime();
-        startLivePolling();
         resetAnalytics();
+        
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+            .then(stream => {
+                liveStream = stream;
+                liveVideo.srcObject = stream;
+                liveVideo.play();
+                
+                liveFeedInterval = setInterval(() => {
+                    if (liveVideo.videoWidth === 0) return;
+                    liveCanvas.width = liveVideo.videoWidth;
+                    liveCanvas.height = liveVideo.videoHeight;
+                    liveCanvas.getContext("2d").drawImage(liveVideo, 0, 0);
+                    liveCanvas.toBlob(blob => {
+                        const formData = new FormData();
+                        formData.append("image", new File([blob], "frame.jpg", { type: "image/jpeg" }));
+                        
+                        fetch("/api/analyze_frame_yolo", { method: "POST", body: formData })
+                            .then(res => res.json())
+                            .then(data => {
+                                if(isLiveMode) {
+                                    videoFeed.src = data.image;
+                                    updateAnalytics(data.info, false);
+                                }
+                            }).catch(err => console.error(err));
+                    }, "image/jpeg", 0.7);
+                }, 500);
+            })
+            .catch(err => {
+                console.error("Camera error:", err);
+                alert("Please allow camera access for the Live Feed.");
+            });
     });
 
     btnUpload.addEventListener("click", () => {
@@ -208,8 +244,12 @@ document.addEventListener("DOMContentLoaded", () => {
         uploadView.classList.add("active");
         
         videoFeed.src = "";
-        fetch("/api/stop_stream", { method: "POST" });
-        stopLivePolling();
+        
+        if (liveFeedInterval) clearInterval(liveFeedInterval);
+        if (liveStream) {
+            liveStream.getTracks().forEach(t => t.stop());
+            liveStream = null;
+        }
         resetAnalytics();
     });
 
