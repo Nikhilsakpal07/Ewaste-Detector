@@ -170,8 +170,8 @@ def process_frame_for_info(frame):
     if model is None:
         return frame, None
     
-    # Using balanced conf, stricter IOU, and agnostic NMS to reduce false positives while maintaining detection
-    result = model.predict(source=frame, save=False, verbose=False, conf=0.45, iou=0.45, agnostic_nms=True, imgsz=640)[0]
+    # Lowered confidence threshold to 0.15 to ensure detections happen
+    result = model.predict(source=frame, save=False, verbose=False, conf=0.15, iou=0.5)[0]
     boxes = result.boxes
     
     info = None
