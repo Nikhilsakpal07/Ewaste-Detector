@@ -85,13 +85,6 @@ fallback_impacts = {
 # Global State
 model = None
 model_error = ""
-try:
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    model_path = os.path.join(base_dir, "runs", "detect", "train-8", "weights", "best.pt")
-    model = YOLO(model_path)
-except Exception as e:
-    model_error = str(e)
-    print(f"Error loading model: {e}")
 
 gemini_cache = {}
 fetching_classes = set()
@@ -171,6 +164,21 @@ def fetch_gemini_info(class_name):
         return fallback
 
 def process_frame_for_info(frame):
+    global model, model_error
+    
+    # Lazy load the model to save RAM on boot and catch exact crash moments
+    if model is None and model_error == "":
+        try:
+            import torch
+            torch.set_num_threads(1)  # Drastically reduces RAM usage on Render
+            
+            base_dir = os.path.dirname(os.path.abspath(__file__))
+            model_path = os.path.join(base_dir, "runs", "detect", "train-8", "weights", "best.pt")
+            model = YOLO(model_path)
+        except Exception as e:
+            model_error = str(e)
+            print(f"Error loading model: {e}")
+
     if model is None:
         return frame, {
             'class': 'None',
