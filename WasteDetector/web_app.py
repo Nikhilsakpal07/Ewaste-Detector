@@ -150,7 +150,7 @@ def fetch_gemini_info(class_name):
         prompt = f"Provide a brief, 2-sentence explanation of the environmental impact of {class_name} as e-waste, and mention if it is hazardous and why. Keep it punchy and informative. Also briefly suggest how to recycle it."
         
         response = client.models.generate_content(
-            model='gemini-1.5-flash',
+            model='gemini-3.8-flash',
             contents=prompt,
         )
         gemini_cache[class_name] = response.text
@@ -345,77 +345,89 @@ def mobile_upload():
 
 @app.route('/api/analyze_image', methods=['POST'])
 def analyze_image():
-    if 'image' not in request.files:
-        return jsonify({"error": "No image uploaded"}), 400
+    try:
+        if 'image' not in request.files:
+            return jsonify({"error": "No image uploaded"}), 400
+            
+        file = request.files['image']
+        npimg = np.frombuffer(file.read(), np.uint8)
+        frame = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
+        if frame is None:
+            return jsonify({"error": "Failed to decode image using cv2.imdecode. Is it a valid image file?"}), 400
         
-    file = request.files['image']
-    npimg = np.frombuffer(file.read(), np.uint8)
-    frame = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
-    
-    processed_frame, info = process_frame_for_info(frame)
-    
-    if info:
-        c_name = info['class']
-        info['impact'] = fetch_gemini_info(c_name)
-        save_to_inventory(info, processed_frame)
-    else:
-        info = {
-            'class': 'None',
-            'confidence': 0,
-            'value': '₹0',
-            'hazard': False,
-            'impact': 'No E-Waste detected in frame.'
-        }
+        processed_frame, info = process_frame_for_info(frame)
         
-    _, buffer = cv2.imencode('.jpg', processed_frame)
-    base64_img = base64.b64encode(buffer).decode('utf-8')
-    
-    return jsonify({
-        "info": info,
-        "image": f"data:image/jpeg;base64,{base64_img}"
-    })
+        if info:
+            c_name = info['class']
+            info['impact'] = fetch_gemini_info(c_name)
+            save_to_inventory(info, processed_frame)
+        else:
+            info = {
+                'class': 'None',
+                'confidence': 0,
+                'value': '₹0',
+                'hazard': False,
+                'impact': 'No E-Waste detected in frame.'
+            }
+            
+        _, buffer = cv2.imencode('.jpg', processed_frame)
+        base64_img = base64.b64encode(buffer).decode('utf-8')
+        
+        return jsonify({
+            "info": info,
+            "image": f"data:image/jpeg;base64,{base64_img}"
+        })
+    except Exception as e:
+        import traceback
+        return jsonify({"error": str(e), "traceback": traceback.format_exc()}), 500
 
 @app.route('/api/analyze_frame_yolo', methods=['POST'])
 def analyze_frame_yolo():
-    if 'image' not in request.files:
-        return jsonify({"error": "No image uploaded"}), 400
-        
-    file = request.files['image']
-    npimg = np.frombuffer(file.read(), np.uint8)
-    frame = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
-    
-    processed_frame, info = process_frame_for_info(frame)
-    
-    if info:
-        c_name = info['class']
-        impact_text = "Checking Gemini AI..."
-        if c_name in gemini_cache:
-            impact_text = gemini_cache[c_name]
-        elif c_name not in fetching_classes:
-            fetching_classes.add(c_name)
-            def bg_fetch(name):
-                txt = fetch_gemini_info(name)
-                gemini_cache[name] = txt
-                fetching_classes.discard(name)
-            threading.Thread(target=bg_fetch, args=(c_name,), daemon=True).start()
+    try:
+        if 'image' not in request.files:
+            return jsonify({"error": "No image uploaded"}), 400
             
-        info['impact'] = impact_text
-    else:
-        info = {
-            'class': 'None',
-            'confidence': 0,
-            'value': '₹0',
-            'hazard': False,
-            'impact': 'Scanning...'
-        }
+        file = request.files['image']
+        npimg = np.frombuffer(file.read(), np.uint8)
+        frame = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
+        if frame is None:
+            return jsonify({"error": "Failed to decode image using cv2.imdecode. Is it a valid image file?"}), 400
         
-    _, buffer = cv2.imencode('.jpg', processed_frame)
-    base64_img = base64.b64encode(buffer).decode('utf-8')
-    
-    return jsonify({
-        "info": info,
-        "image": f"data:image/jpeg;base64,{base64_img}"
-    })
+        processed_frame, info = process_frame_for_info(frame)
+        
+        if info:
+            c_name = info['class']
+            impact_text = "Checking Gemini AI..."
+            if c_name in gemini_cache:
+                impact_text = gemini_cache[c_name]
+            elif c_name not in fetching_classes and c_name != 'None':
+                fetching_classes.add(c_name)
+                def bg_fetch(name):
+                    txt = fetch_gemini_info(name)
+                    gemini_cache[name] = txt
+                    fetching_classes.discard(name)
+                threading.Thread(target=bg_fetch, args=(c_name,), daemon=True).start()
+                
+            info['impact'] = impact_text
+        else:
+            info = {
+                'class': 'None',
+                'confidence': 0,
+                'value': '₹0',
+                'hazard': False,
+                'impact': 'Scanning...'
+            }
+            
+        _, buffer = cv2.imencode('.jpg', processed_frame)
+        base64_img = base64.b64encode(buffer).decode('utf-8')
+        
+        return jsonify({
+            "info": info,
+            "image": f"data:image/jpeg;base64,{base64_img}"
+        })
+    except Exception as e:
+        import traceback
+        return jsonify({"error": str(e), "traceback": traceback.format_exc()}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000, threaded=True)
