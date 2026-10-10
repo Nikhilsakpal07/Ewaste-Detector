@@ -297,13 +297,24 @@ def mobile_upload():
         
     file = request.files['image']
     npimg = np.frombuffer(file.read(), np.uint8)
-    img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
+    frame = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
     
-    info = process_image_with_gemini(img)
-    if info and info.get('class') != 'None':
-        save_to_inventory(info, img)
+    processed_frame, info = process_frame_for_info(frame)
+    
+    if info:
+        c_name = info['class']
+        info['impact'] = fetch_gemini_info(c_name)
+        save_to_inventory(info, processed_frame)
+    else:
+        info = {
+            'class': 'None',
+            'confidence': 0,
+            'value': '₹0',
+            'hazard': False,
+            'impact': 'No E-Waste detected in frame.'
+        }
         
-    _, buffer = cv2.imencode('.jpg', img)
+    _, buffer = cv2.imencode('.jpg', processed_frame)
     base64_img = base64.b64encode(buffer).decode('utf-8')
     
     mobile_sync_data = {
@@ -312,65 +323,6 @@ def mobile_upload():
     }
     return jsonify({"status": "success", "data": mobile_sync_data})
 
-def process_image_with_gemini(img):
-    info = None
-    try:
-        api_key = os.environ.get("GEMINI_API_KEY", "")
-        if api_key:
-            client = genai.Client(api_key=api_key)
-            from PIL import Image
-            pil_img = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-            
-            prompt = f"""
-Analyze this image and identify if there is any E-Waste (electronic waste) in it.
-Identify the closest matching category from this list: {', '.join(cls_name)}.
-If none match well, just say 'None'.
-Respond ONLY with a JSON object in this format (no code blocks, just raw JSON):
-{{
-    "class": "Category Name",
-    "confidence": 99,
-    "impact": "A brief 2-sentence explanation of the environmental impact, if it is hazardous and why, and how to recycle it."
-}}
-"""
-            response = client.models.generate_content(
-                model='gemini-1.5-flash',
-                contents=[prompt, pil_img]
-            )
-            text = response.text.replace('```json', '').replace('```', '').strip()
-            data = json.loads(text)
-            
-            c_name = data.get("class", "None")
-            val = value_mapping.get(c_name, 0)
-            is_hazard = c_name in hazard_mapping
-            
-            if c_name != "None":
-                info = {
-                    'class': c_name,
-                    'confidence': data.get("confidence", 95),
-                    'value': f"₹{val}",
-                    'hazard': is_hazard,
-                    'hazard_text': hazard_mapping.get(c_name, ""),
-                    'impact': data.get("impact", "Identified by Gemini AI.")
-                }
-    except Exception as e:
-        # Silently fallback to YOLO if Gemini Vision API hits rate limits
-        pass
-
-    if not info:
-        processed_frame, info = process_frame_for_info(img)
-        if info:
-            c_name = info['class']
-            info['impact'] = fetch_gemini_info(c_name)
-        else:
-            info = {
-                'class': 'None',
-                'confidence': 0,
-                'value': '₹0',
-                'hazard': False,
-                'impact': 'No E-Waste detected.'
-            }
-    return info
-
 @app.route('/api/analyze_image', methods=['POST'])
 def analyze_image():
     if 'image' not in request.files:
@@ -378,13 +330,24 @@ def analyze_image():
         
     file = request.files['image']
     npimg = np.frombuffer(file.read(), np.uint8)
-    img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
+    frame = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
     
-    info = process_image_with_gemini(img)
-    if info and info.get('class') != 'None':
-        save_to_inventory(info, img)
+    processed_frame, info = process_frame_for_info(frame)
+    
+    if info:
+        c_name = info['class']
+        info['impact'] = fetch_gemini_info(c_name)
+        save_to_inventory(info, processed_frame)
+    else:
+        info = {
+            'class': 'None',
+            'confidence': 0,
+            'value': '₹0',
+            'hazard': False,
+            'impact': 'No E-Waste detected in frame.'
+        }
         
-    _, buffer = cv2.imencode('.jpg', img)
+    _, buffer = cv2.imencode('.jpg', processed_frame)
     base64_img = base64.b64encode(buffer).decode('utf-8')
     
     return jsonify({
