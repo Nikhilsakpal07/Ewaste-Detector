@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RECIBOT // E-WASTE AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Outfit:wght@300;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script>
+        const localIp = "{{ local_ip }}";
+    </script>
+</head>
+<body>
+    <!-- Custom Cursor -->
+    <div id="cursor"></div>
+    <div id="cursor-follower"></div>
+
+    <!-- Backgrounds -->
+    <div class="circuit-bg"></div>
+    <div class="vignette"></div>
+
+    <!-- Decorative HUD Elements -->
+    <div class="hud top-left">SYS.RECIBOT.v8</div>
+    <div class="hud top-right" id="hud-clock">00:00:00</div>
+    <div class="hud bottom-left">AI_STATUS: ACTIVE</div>
+    <div class="hud bottom-right">TARGET: E-WASTE</div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-logo glitch" data-text="♻️ RECIBOT">♻️ RECIBOT</div>
+        <div class="nav-links">
+            <a href="#hero">INIT</a>
+            <a href="#about">SYSTEMS</a>
+            <a href="#impact">IMPACT_DATA</a>
+            <a href="#" class="glitch" id="btn-inventory" data-text="INVENTORY_LOG">INVENTORY_LOG</a>
+            <a href="#" class="glitch" id="btn-mobile-connect" data-text="MOBILE_LINK" style="color: var(--hazard);">MOBILE_LINK</a>
+            <a href="#app" class="btn-primary-outline">[ RUN_DETECTOR ]</a>
+        </div>
+    </nav>
+
+    <!-- Scrolling Marquee -->
+    <div class="marquee-wrapper">
+        <div class="marquee">
+            <span>DETECTING 77 CLASSES OF E-WASTE // SMARTPHONES // MOTHERBOARDS // CRT MONITORS // LAPTOPS // BATTERIES // RECOVERING PRECIOUS METALS // PROTECTING ECOSYSTEMS // </span>
+            <span>DETECTING 77 CLASSES OF E-WASTE // SMARTPHONES // MOTHERBOARDS // CRT MONITORS // LAPTOPS // BATTERIES // RECOVERING PRECIOUS METALS // PROTECTING ECOSYSTEMS // </span>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section id="hero" class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title glitch" data-text="MINE THE">MINE THE <br><span class="highlight">FUTURE.</span></h1>
+            <p class="hero-subtitle">Don't discard. Decode. Our YOLOv8 neural network and Gemini AI extract the hidden value and hazard data from electronic waste in real-time.</p>
+            <div class="hero-actions">
+                <a href="#app" class="btn-primary">INITIALIZE SCANNER</a>
+            </div>
+        </div>
+        <div class="hero-graphic">
+            <div class="tech-circle"></div>
+            <div class="tech-circle small"></div>
+            <img src="https://images.unsplash.com/photo-1550009158-9ebf69173e03?auto=format&fit=crop&w=800&q=80" alt="Cyberpunk Circuit" class="hero-img">
+            <div class="scanline"></div>
+            <div class="floating-chip chip-1">[ YOLOv8_VISION ]</div>
+            <div class="floating-chip chip-2">[ GEMINI_LLM ]</div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about-section">
+        <div class="section-container">
+            <div class="section-header">
+                <h2 class="section-heading glitch" data-text="CORE_SYSTEMS">CORE_SYSTEMS</h2>
+                <div class="hex-grid" id="random-hex">0x3F8A 0x9B21 0xFFFF</div>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card glass-card tilt-card">
+                    <div class="f-icon">👁️</div>
+                    <h3>Computer Vision</h3>
+                    <p>Sub-millisecond object detection analyzing 77 distinct hardware categories through advanced neural pathways.</p>
+                    <div class="card-border"></div>
+                </div>
+                <div class="feature-card glass-card tilt-card">
+                    <div class="f-icon">🧠</div>
+                    <h3>Gemini AI Analysis</h3>
+                    <p>Instant environmental extraction. Identifies toxic chemical leaks and provides precise recycling protocols.</p>
+                    <div class="card-border"></div>
+                </div>
+                <div class="feature-card glass-card tilt-card">
+                    <div class="f-icon">💎</div>
+                    <h3>Urban Mining</h3>
+                    <p>Quantifies raw material value (Gold, Silver, Palladium) hidden inside discarded silicon and copper.</p>
+                    <div class="card-border"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Impact Section -->
+    <section id="impact" class="impact-section">
+        <div class="section-container split-layout">
+            <div class="split-text">
+                <h2 class="section-heading">THE TOXIC <br><span class="highlight">TRUTH</span></h2>
+                <p>E-waste represents 2% of America's trash in landfills, but it equals 70% of overall toxic waste. Lead, mercury, and cadmium are leaching into our water tables.</p>
+                <p>By utilizing <strong>ReciBot</strong>, recycling facilities and individuals can instantly sort hazardous materials and identify components ripe for precious metal extraction.</p>
+                <div class="bar-chart">
+                    <div class="bar-row">
+                        <span>RECYCLED</span>
+                        <div class="bar-bg"><div class="bar-fill" style="width: 17%; background: var(--hazard);">17%</div></div>
+                    </div>
+                    <div class="bar-row">
+                        <span>TRASHED</span>
+                        <div class="bar-bg"><div class="bar-fill" style="width: 83%; background: var(--primary);">83%</div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="split-stats">
+                <div class="glass-card tilt-card stat-card">
+                    <div class="stat-num glow-text">100x</div>
+                    <div class="stat-label">More Gold in E-Waste than in Ore</div>
+                </div>
+                <div class="glass-card tilt-card stat-card mt">
+                    <div class="stat-num glow-text">77</div>
+                    <div class="stat-label">Device Architectures Recognized</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- The App Section -->
+    <section id="app" class="app-section">
+        <div class="app-container">
+            <header class="app-header">
+                <h2 class="section-heading glitch" data-text="TERMINAL_ACCESS">TERMINAL_ACCESS</h2>
+                <p class="subtitle">Awaiting visual input for hardware classification.</p>
+            </header>
+
+            <div class="controls">
+                <div class="toggle-container">
+                    <button id="btn-live" class="toggle-btn active">[ LIVE_FEED ]</button>
+                    <button id="btn-upload" class="toggle-btn">[ STATIC_UPLOAD ]</button>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <!-- Left Side: Vision -->
+                <div class="vision-panel panel tilt-card">
+                    <!-- Live View -->
+                    <div id="live-view" class="view-section active">
+                        <div class="video-container">
+                            <img id="video-feed" src="{{ url_for('video_feed') }}" alt="Live Video Feed">
+                            <div class="overlay-scan">
+                                <div class="scan-line"></div>
+                                <div class="reticle"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Upload View -->
+                    <div id="upload-view" class="view-section">
+                        <div class="upload-container" id="upload-box">
+                            <input type="file" id="file-input" accept="image/*" hidden>
+                            <div class="upload-icon glitch" data-text="📸">📸</div>
+                            <h3 style="font-family: 'Share Tech Mono';">PROVIDE VISUAL DATA</h3>
+                            <div class="flex-row mt-4" style="gap: 1rem; margin-top: 1.5rem;">
+                                <button id="btn-trigger-file" class="action-btn">UPLOAD_FILE</button>
+                                <button id="btn-trigger-webcam" class="action-btn">INIT_WEBCAM</button>
+                            </div>
+                        </div>
+
+                        <div id="webcam-box" style="display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; position: relative;">
+                            <video id="webcam-video" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px; border: 2px solid var(--primary);"></video>
+                            <div class="overlay-scan"><div class="reticle"></div></div>
+                            <button id="btn-capture-webcam" class="btn-primary" style="position: absolute; bottom: 20px; z-index: 10;">[ CAPTURE_FRAME ]</button>
+                            <button id="btn-cancel-webcam" class="action-btn" style="position: absolute; top: 10px; right: 10px; z-index: 10; background: rgba(0,0,0,0.8);">ABORT</button>
+                            <canvas id="webcam-canvas" style="display: none;"></canvas>
+                        </div>
+
+                        <div class="preview-container" style="display: none;">
+                            <div class="video-container">
+                                <img id="image-preview" src="" alt="Detected Image">
+                                <div class="overlay-scan"><div class="scan-line"></div></div>
+                            </div>
+                            <button id="btn-reset-upload" class="action-btn mt-4" style="margin-top: 1rem;">NEW_SCAN</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Side: Analytics -->
+                <div class="analytics-panel panel tilt-card">
+                    <div class="data-stream" id="data-stream">Analyzing binary...</div>
+                    
+                    <div class="card-glass">
+                        <h2 class="card-title">DETECTION_RESULT</h2>
+                        <div class="result-header">
+                            <div class="class-badge glitch-text" id="detected-class">AWAITING...</div>
+                            <div class="confidence" id="detected-conf">0.00%</div>
+                        </div>
+                    </div>
+
+                    <div class="card-glass flex-row">
+                        <div class="value-box">
+                            <span class="label">EST_RECOVERY_VALUE</span>
+                            <span class="value digital-num" id="detected-value">₹0</span>
+                        </div>
+                        <div class="hazard-box" id="hazard-badge">
+                            <span class="icon">✅</span>
+                            <span class="text">SECURE</span>
+                        </div>
+                    </div>
+
+                    <div class="card-glass impact-card" id="hazard-warning-card" style="display: none; border-color: var(--hazard);">
+                        <h3 class="hazard-title glitch" data-text="☣️ HAZMAT_WARNING">☣️ HAZMAT_WARNING</h3>
+                        <p id="hazard-text" style="font-family: 'Share Tech Mono';">Contains hazardous materials.</p>
+                    </div>
+
+                    <div class="card-glass impact-card">
+                        <h3 class="card-title">AI_IMPACT_ANALYSIS</h3>
+                        <p class="impact-text" id="detected-impact">System idle. Waiting for object detection...</p>
+                    </div>
+
+                    <div class="card-glass" id="locator-card" style="display: none; text-align: center; margin-top: 15px;">
+                        <button id="btn-locate" class="btn-primary" style="width: 100%; padding: 10px; font-family: 'Share Tech Mono'; letter-spacing: 1px;">[ LOCATE_DROP_OFF_FACILITY ]</button>
+                        <p id="locator-status" style="font-size: 0.8rem; margin-top: 10px; color: var(--text-muted);"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Inventory Modal -->
+    <div id="inventory-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15,17,26,0.95); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; overflow: hidden;">
+        <h2 style="color: var(--primary); margin-bottom: 20px; font-size: 2rem;" class="glitch" data-text="SCANNED_INVENTORY_LOG">SCANNED_INVENTORY_LOG</h2>
+        <div id="inventory-container" style="background: var(--surface); width: 90%; max-width: 900px; height: 70vh; border-radius: 10px; overflow-y: auto; padding: 20px; border: 1px solid rgba(130, 170, 255, 0.2); box-shadow: 0 0 20px rgba(0,0,0,0.5);">
+            <p style="text-align: center; color: var(--text-muted); font-style: italic;">Loading inventory records...</p>
+        </div>
+        <button id="btn-close-inventory" class="btn-primary" style="margin-top: 30px; font-family: 'Share Tech Mono';">CLOSE LOG</button>
+    </div>
+
+    <!-- Mobile Connect Modal -->
+    <div id="mobile-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15,17,26,0.9); z-index: 1000; justify-content: center; align-items: center; flex-direction: column;">
+        <h2 style="color: var(--primary);">LINK MOBILE SCANNER</h2>
+        <p style="color: var(--text-muted); margin-bottom: 20px;">Scan this QR code with your phone's camera.</p>
+        <div style="background: white; padding: 20px; border-radius: 10px;">
+            <img id="qr-code" src="" alt="QR Code" width="200" height="200" />
+        </div>
+        <button id="btn-close-modal" class="btn-primary" style="margin-top: 30px; font-family: 'Share Tech Mono';">CLOSE CONNECTION</button>
+    </div>
+
+    <footer class="footer">
+        <p>SYS.RECIBOT // BUILT WITH YOLOv8 & GOOGLE GEMINI AI // NO PLANET B</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}?v=1.1"></script>
+</body>
+</html>

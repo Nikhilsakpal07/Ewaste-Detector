@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+.env/
+*.log
+inventory.json
+WasteDetector/ewaste-dataset/
+WasteDetector/runs/detect/train*/weights/last.pt

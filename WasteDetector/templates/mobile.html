@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Recibot Scanner</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #121212;
+            --surface-color: #1e1e1e;
+            --primary: #00FFA3;
+            --secondary: #82AAFF;
+            --danger: #FF5370;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .header {
+            width: 100%;
+            padding: 20px 0;
+            text-align: center;
+            background-color: var(--surface-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--primary);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 400px;
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 40px;
+        }
+
+        .instruction {
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .btn-capture {
+            background-color: var(--primary);
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            padding: 16px 32px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(0, 255, 163, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.1s ease;
+        }
+
+        .btn-capture:active {
+            transform: scale(0.97);
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+            margin: 30px auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        #status-text {
+            color: var(--text-muted);
+            margin-top: 15px;
+            font-weight: 600;
+            display: none;
+        }
+
+        /* Result Card */
+        .result-card {
+            display: none;
+            width: 100%;
+            background-color: var(--surface-color);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-top: 30px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .result-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .result-content {
+            padding: 20px;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .result-title {
+            margin: 0;
+            font-size: 1.4rem;
+            color: var(--primary);
+        }
+
+        .result-value {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #C3E88D;
+            background: rgba(195, 232, 141, 0.1);
+            padding: 4px 10px;
+            border-radius: 8px;
+        }
+
+        .hazard-badge {
+            display: inline-block;
+            background-color: rgba(255, 83, 112, 0.15);
+            color: var(--danger);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 83, 112, 0.3);
+        }
+
+        .impact-text {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .hazard-mode {
+            border-bottom: 2px solid var(--danger);
+        }
+        
+        .title-hazard {
+            color: var(--danger);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>RECIBOT</h1>
+    </div>
+
+    <div class="container">
+        <p class="instruction">Point your camera at electronic waste. The results will appear here and sync to your desktop automatically.</p>
+        
+        <label for="file-input" class="btn-capture">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+            Scan E-Waste
+        </label>
+        <input type="file" id="file-input" accept="image/*" capture="environment">
+        
+        <div class="spinner" id="spinner"></div>
+        <div id="status-text">Processing image...</div>
+
+        <!-- Result Card -->
+        <div class="result-card" id="result-card">
+            <img src="" alt="Detected E-Waste" class="result-image" id="result-image">
+            <div class="result-content">
+                <div class="result-header">
+                    <h2 class="result-title" id="result-title">Smartphone</h2>
+                    <div class="result-value" id="result-value">₹200</div>
+                </div>
+                <div id="hazard-badge" class="hazard-badge" style="display: none;">
+                    ⚠️ HAZARDOUS MATERIAL
+                </div>
+                <p class="impact-text" id="result-impact">
+                    Analysis data will appear here.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('file-input');
+        const spinner = document.getElementById('spinner');
+        const statusText = document.getElementById('status-text');
+        
+        const resultCard = document.getElementById('result-card');
+        const resultImage = document.getElementById('result-image');
+        const resultTitle = document.getElementById('result-title');
+        const resultValue = document.getElementById('result-value');
+        const resultImpact = document.getElementById('result-impact');
+        const hazardBadge = document.getElementById('hazard-badge');
+
+        fileInput.addEventListener('change', () => {
+            if (!fileInput.files.length) return;
+            const file = fileInput.files[0];
+            
+            // UI State: Loading
+            resultCard.style.display = 'none';
+            spinner.style.display = 'block';
+            statusText.style.display = 'block';
+            statusText.innerText = "Analyzing E-Waste...";
+            statusText.style.color = "var(--text-muted)";
+
+            const formData = new FormData();
+            formData.append("image", file);
+
+            fetch("/api/mobile_upload", {
+                method: "POST",
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                spinner.style.display = 'none';
+                statusText.style.display = 'none';
+
+                if (data.status === "success" && data.data) {
+                    const info = data.data.info;
+                    
+                    if (info.class === "None") {
+                        statusText.style.display = 'block';
+                        statusText.innerText = "No recognizable e-waste detected.";
+                        return;
+                    }
+
+                    // Populate UI
+                    resultImage.src = data.data.image;
+                    resultTitle.innerText = info.class.toUpperCase();
+                    resultValue.innerText = info.value;
+                    resultImpact.innerText = info.impact;
+
+                    if (info.hazard) {
+                        resultImage.classList.add('hazard-mode');
+                        resultTitle.classList.add('title-hazard');
+                        hazardBadge.style.display = 'inline-block';
+                        
+                        if(info.hazard_text) {
+                            hazardBadge.innerText = `⚠️ ${info.hazard_text.replace('HAZMAT WARNING: ', '')}`;
+                        } else {
+                            hazardBadge.innerText = '⚠️ HAZARDOUS MATERIAL';
+                        }
+                    } else {
+                        resultImage.classList.remove('hazard-mode');
+                        resultTitle.classList.remove('title-hazard');
+                        hazardBadge.style.display = 'none';
+                    }
+
+                    resultCard.style.display = 'block';
+
+                } else {
+                    statusText.style.display = 'block';
+                    statusText.innerText = "Error: " + (data.error || "Unknown error");
+                    statusText.style.color = "var(--danger)";
+                }
+            })
+            .catch(err => {
+                spinner.style.display = 'none';
+                statusText.style.display = 'block';
+                statusText.innerText = "Network connection failed.";
+                statusText.style.color = "var(--danger)";
+                console.error(err);
+            });
+        });
+    </script>
+</body>
+</html>
