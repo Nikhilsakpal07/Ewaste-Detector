@@ -429,7 +429,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (btnMobileConnect && mobileModal) {
         btnMobileConnect.addEventListener("click", (e) => {
             e.preventDefault();
-            const url = `http://${localIp}:5000/mobile`;
+            const url = window.location.origin + '/mobile';
             qrCode.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(url)}&bgcolor=FFFFFF`;
             mobileModal.style.display = "flex";
         });
