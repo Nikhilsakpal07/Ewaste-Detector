@@ -84,9 +84,13 @@ fallback_impacts = {
 
 # Global State
 model = None
+model_error = ""
 try:
-    model = YOLO("runs/detect/train-8/weights/best.pt")
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    model_path = os.path.join(base_dir, "runs", "detect", "train-8", "weights", "best.pt")
+    model = YOLO(model_path)
 except Exception as e:
+    model_error = str(e)
     print(f"Error loading model: {e}")
 
 gemini_cache = {}
@@ -168,7 +172,13 @@ def fetch_gemini_info(class_name):
 
 def process_frame_for_info(frame):
     if model is None:
-        return frame, None
+        return frame, {
+            'class': 'None',
+            'confidence': 0,
+            'value': '₹0',
+            'hazard': False,
+            'impact': f'CRITICAL ERROR: YOLO failed to load! Details: {model_error}'
+        }
     
     # Lowered confidence threshold to 0.15 to ensure detections happen
     result = model.predict(source=frame, save=False, verbose=False, conf=0.15, iou=0.5)[0]
