@@ -220,6 +220,14 @@ document.addEventListener("DOMContentLoaded", () => {
                         fetch("/api/analyze_frame_yolo", { method: "POST", body: formData })
                             .then(res => res.json())
                             .then(data => {
+                                if (data.error) {
+                                    console.error(data.error);
+                                    if(isLiveMode) {
+                                        elClass.innerText = "SYS_ERROR";
+                                        elImpact.innerText = data.error;
+                                    }
+                                    return;
+                                }
                                 if(isLiveMode) {
                                     videoFeed.src = data.image;
                                     updateAnalytics(data.info, false);
@@ -330,13 +338,19 @@ document.addEventListener("DOMContentLoaded", () => {
         fetch("/api/analyze_image", { method: "POST", body: formData })
         .then(res => res.json())
         .then(data => {
+            if (data.error) {
+                console.error(data.traceback || data.error);
+                elClass.innerText = "SYS_ERROR";
+                elImpact.innerText = `CRASH: ${data.error}`;
+                return;
+            }
             imagePreview.src = data.image; 
             updateAnalytics(data.info, true);
         })
         .catch(err => {
             console.error(err);
             elClass.innerText = "SYS_ERROR";
-            elImpact.innerText = "Failed to parse visual data.";
+            elImpact.innerText = "Network Error: Could not connect to the cloud server. It may have crashed due to memory limits.";
         });
     }
 
