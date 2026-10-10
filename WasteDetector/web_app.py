@@ -117,7 +117,9 @@ inventory_history = load_inventory()
 def save_to_inventory(info, img_array):
     if info and info.get('class') != 'None':
         filename = f"item_{int(time.time())}_{uuid.uuid4().hex[:6]}.jpg"
-        filepath = os.path.join("static", "uploads", filename)
+        upload_dir = os.path.join("static", "uploads")
+        os.makedirs(upload_dir, exist_ok=True)
+        filepath = os.path.join(upload_dir, filename)
         # Convert RGB back to BGR for cv2 if needed, but it should already be BGR
         cv2.imwrite(filepath, img_array)
         
